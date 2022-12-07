@@ -18,18 +18,22 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-require_relative 'version'
+require_relative '../../lib/gitnotifier/gitnotifier'
 
-# GitNotifier class.
+require 'test_helper'
+require 'gitnotifier/version'
+require 'minitest/autorun'
+
+# Test for Notifier class.
 # Author:: Ivanchuk Ivan (clicker.heroes.acg@gmail.com)
 # Copyright:: Copyright (c) 2022 Ivanchuck Ivan
 # License:: MIT
-class Notifier
-  class NotifierError < StandardError; end
+class NotifierTest < MiniTest::Test
+  def test_that_it_has_a_version_number
+    refute_nil GitNotifier::VERSION
+  end
 
-  attr_reader :token
-
-  def initialize(token)
-    @token = token
+  def test_token_accepted
+    assert_equal('tkn', Notifier.new('tkn').token)
   end
 end
