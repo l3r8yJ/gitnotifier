@@ -1,8 +1,8 @@
-require_relative "lib/git/notifier/version"
+require_relative "lib/gitnotifier/version"
 
 Gem::Specification.new do |spec|
   spec.name          = "git-notifier"
-  spec.version       = Git::Notifier::VERSION
+  spec.version       = GitNotifier::VERSION
   spec.authors       = ["Ivan"]
   spec.email         = ["clicker.heroes.acg@gmail.com"]
 
