@@ -1,5 +1,3 @@
-assets:
-  rubygems.yml: yegor256/home#assets/rubygems.yml
 install: |
   pdd -f /dev/null
   sudo bundle install --no-color "--gemfile=$(pwd)/Gemfile"
@@ -8,7 +6,7 @@ release:
     bundle exec rake
     rm -rf *.gem
     sed -i "s/0\.0\.0/${tag}/g" lib/git-notifier/version.rb
-    git add lib/git-notifier/version.rb
+    git add lib/gitnotifier/version.rb
     git commit -m "version set to ${tag}"
     gem build git-notifier.gemspec
     chmod 0600 ../rubygems.yml
