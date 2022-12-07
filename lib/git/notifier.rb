@@ -1,10 +1,8 @@
-# frozen_string_literal: true
-
-require_relative "notifier/version"
+require_relative 'notifier/version'
 
 module Git
   module Notifier
-    class Error < StandardError; end
+    class NotifierError < StandardError; end
     # Your code goes here...
   end
 end
