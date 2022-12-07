@@ -25,8 +25,6 @@ require_relative 'version'
 # Copyright:: Copyright (c) 2022 Ivanchuck Ivan
 # License:: MIT
 class Notifier
-  # @todo #1:30min Implement some logic.
-  # This is a fake puzzle for 0pdd puzzler.
   class NotifierError < StandardError; end
 
   attr_reader :token
