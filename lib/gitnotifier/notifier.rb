@@ -91,8 +91,9 @@ class Notifier
     begin
       @logger.info("Trying to update #{message.from.id} token")
       User.new(message.from.id).update_token(token) if valid?(token)
-    rescue
+    rescue StandartError => e
       txt = 'Something went wrong...'
+      @logger.error(e.to_s)
     end
     txt
   end
