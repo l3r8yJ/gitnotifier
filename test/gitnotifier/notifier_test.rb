@@ -18,7 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-require_relative '../../lib/gitnotifier/gitnotifier'
+require_relative '../../lib/gitnotifier/notifier'
 
 require 'test_helper'
 require 'gitnotifier/version'
