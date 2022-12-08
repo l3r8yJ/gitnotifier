@@ -58,8 +58,6 @@ class Notifier
           )
         end
         if message.text.include?('/reset')
-          # @todo #auth:30min Create reset.
-          # We have to impelement command which resets the GH token.
           txt = update_user_token(message)
           bot.api.send_message(
             chat_id: message.chat.id,
@@ -93,9 +91,8 @@ class Notifier
     begin
       @logger.info("Trying to update #{message.from.id} token")
       User.new(message.from.id).update_token(token) if valid?(token)
-    rescue PG::UniqueViolation => e
-      txt = 'You already registred your token!'
-      @logger.error("Error: #{e}")
+    rescue
+      txt = 'Something went wrong...'
     end
     txt
   end
