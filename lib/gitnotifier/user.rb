@@ -28,11 +28,11 @@ require 'yaml'
 class User
   # @todo #7 Tests/ test user.
   # We have to write integration and unit tests for User class.
-  def initialize(chat, github)
-    @chat = chat
+  def initialize(id, github)
+    @id = id
     @github = github
     config = YAML.load_file('pg.yml')['database']
-    @pgcon = PGconn.new(
+    @pgcon = PG.connect(
       host: config['host'],
       user: config['user'],
       password: config['password'],
@@ -42,8 +42,8 @@ class User
 
   def save
     @pgcon.exec(
-      'INSERT INTO bot_user(chat_id, token) VALUES ($1, $2)',
-      [@chat, @github]
+      'INSERT INTO bot_user(id, token) VALUES ($1, $2)',
+      [@id, @github]
     )
   end
 end

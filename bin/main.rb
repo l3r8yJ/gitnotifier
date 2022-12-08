@@ -20,5 +20,4 @@
 
 require_relative '../lib/gitnotifier/notifier'
 
-puts 'Hello, i\'m git notifier bot!'
 Notifier.new.run()

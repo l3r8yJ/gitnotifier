@@ -19,6 +19,7 @@
 # SOFTWARE.
 
 require_relative 'version'
+require_relative 'user'
 require 'telegram/bot'
 require 'yaml'
 
@@ -33,11 +34,13 @@ class Notifier
 
   def initialize
     @token = YAML.load_file('bot.yml')['bot']['token']
+    @logger = Logger.new($stdout)
     @start = 'Hello, i\'ll notify you! Please, send /auth YOUR_TOKEN to authorize!'
   end
 
   def run
     Telegram::Bot::Client.run(@token) do |bot|
+      @logger.info('Bot started!')
       bot.listen do |message|
         if message.text.include?('/start')
           bot.api.send_message(
@@ -46,19 +49,35 @@ class Notifier
           )
         end
         if message.text.include?('/auth')
-          token = token(message)
-          msg = "Your token is: #{token}"
-          msg = 'Please enter correct token' unless valid?(token)
+          txt = save_user(message)
           bot.api.send_message(
             chat_id: message.chat.id,
-            text: msg
+            text: txt
           )
+        end
+        if message.text.include?('/reset')
+          # @todo #db_on_start:30min Create reset.
+          # We have to impelement command which resets the GH token.
         end
       end
     end
   end
 
   private
+
+  def save_user(message)
+    token = token(message)
+    txt = 'Your token successfully registred!'
+    txt = 'Please enter correct token.' unless valid?(token)
+    begin
+      @logger.info("Trying to register the user #{message.from.id}")
+      User.new(message.from.id, token).save if valid?(token)
+    rescue PG::UniqueViolation => e
+      txt = 'You already registred your token!'
+      @logger.error("Error: #{e}")
+    end
+    txt
+  end
 
   def token(message)
     message.text.gsub('/auth', '').gsub(' ', '')
