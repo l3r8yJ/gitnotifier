@@ -27,6 +27,9 @@ require 'yaml'
 # Copyright:: Copyright (c) 2022 Ivanchuck Ivan
 # License:: MIT
 class Notifier
+  # @todo #telegram:30min Bot/ Add auth.
+  # We have to implement auth via github token.
+  # Token has to be only with notifications access.
   class NotifierError < StandardError; end
 
   attr_reader :token
