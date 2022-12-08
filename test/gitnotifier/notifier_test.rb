@@ -23,6 +23,7 @@ require_relative '../../lib/gitnotifier/gitnotifier'
 require 'test_helper'
 require 'gitnotifier/version'
 require 'minitest/autorun'
+require 'yaml'
 
 # Test for Notifier class.
 # Author:: Ivanchuk Ivan (clicker.heroes.acg@gmail.com)
@@ -34,6 +35,17 @@ class NotifierTest < MiniTest::Test
   end
 
   def test_token_accepted
-    assert_equal('tkn', Notifier.new('tkn').token)
+    assert_equal(
+      true,
+      Notifier.new.token.include?(':')
+    )
+  end
+
+  def test_env_bot_token
+    config = YAML.load_file('bot.yml')
+    assert_equal(
+      true,
+      config['bot']['token'].include?(':')
+    )
   end
 end

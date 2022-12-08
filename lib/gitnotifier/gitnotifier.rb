@@ -19,6 +19,8 @@
 # SOFTWARE.
 
 require_relative 'version'
+require 'telegram/bot'
+require 'yaml'
 
 # GitNotifier class.
 # Author:: Ivanchuk Ivan (clicker.heroes.acg@gmail.com)
@@ -29,7 +31,29 @@ class Notifier
 
   attr_reader :token
 
-  def initialize(token)
-    @token = token
+  def initialize
+    @token = YAML.load_file('bot.yml')['bot']['token']
+    @start = 'Hello, i\'ll notify your!\
+    \nBut you need to authrize GitHub token!'
+    @auth = 'Please, send your GitHub token!'
+  end
+
+  def run
+    Telegram::Bot::Client.run(@token) do |bot|
+      bot.listen do |message|
+        case message.text
+        when '/start'
+          bot.api.send_message(
+            chat_id: message.chat_id,
+            text: @start
+          )
+        when '/authorize'
+          bot.api.send_message(
+            chat_id: message.chat_id,
+            text: @auth
+          )
+        end
+      end
+    end
   end
 end
