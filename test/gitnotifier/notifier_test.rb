@@ -33,19 +33,4 @@ class NotifierTest < MiniTest::Test
   def test_that_it_has_a_version_number
     refute_nil GitNotifier::VERSION
   end
-
-  def test_token_accepted
-    assert_equal(
-      true,
-      Notifier.new.token.include?(':')
-    )
-  end
-
-  def test_env_bot_token
-    config = YAML.load_file('bot.yml')
-    assert_equal(
-      true,
-      config['bot']['token'].include?(':')
-    )
-  end
 end
