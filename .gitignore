@@ -16,3 +16,4 @@ rdoc/
 .sass-cache/
 *.iml
 bot.yml
+pg.yml

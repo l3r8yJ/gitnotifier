@@ -10,3 +10,5 @@ gem 'minitest', '~> 5.0'
 gem 'rubocop', '~> 0.80'
 
 gem 'telegram-bot-ruby', '~> 0.23.0'
+
+gem 'pg', '~> 1.4.5'

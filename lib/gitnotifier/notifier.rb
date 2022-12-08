@@ -27,36 +27,44 @@ require 'yaml'
 # Copyright:: Copyright (c) 2022 Ivanchuck Ivan
 # License:: MIT
 class Notifier
-  # @todo #telegram:30min Bot/ Add auth.
-  # We have to implement auth via github token.
-  # Token has to be only with notifications access.
+  # @todo #7 Tests/ test bot.
+  # We have to write integration and unit tests for Notifier class.
   class NotifierError < StandardError; end
-
-  attr_reader :token
 
   def initialize
     @token = YAML.load_file('bot.yml')['bot']['token']
-    @start = 'Hello, i\'ll notify your!\
-    \nBut you need to authrize GitHub token!'
-    @auth = 'Please, send your GitHub token!'
+    @start = 'Hello, i\'ll notify you! Please, send /auth YOUR_TOKEN to authorize!'
   end
 
   def run
     Telegram::Bot::Client.run(@token) do |bot|
       bot.listen do |message|
-        case message.text
-        when '/start'
+        if message.text.include?('/start')
           bot.api.send_message(
-            chat_id: message.chat_id,
+            chat_id: message.chat.id,
             text: @start
           )
-        when '/authorize'
+        end
+        if message.text.include?('/auth')
+          token = token(message)
+          msg = "Your token is: #{token}"
+          msg = 'Please enter correct token' unless valid?(token)
           bot.api.send_message(
-            chat_id: message.chat_id,
-            text: @auth
+            chat_id: message.chat.id,
+            text: msg
           )
         end
       end
     end
+  end
+
+  private
+
+  def token(message)
+    message.text.gsub('/auth', '').gsub(' ', '')
+  end
+
+  def valid?(token)
+    /^ghp_[a-zA-Z0-9]{36}$/.match?(token)
   end
 end
