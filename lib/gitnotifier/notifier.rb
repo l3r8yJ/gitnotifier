@@ -30,9 +30,6 @@ require 'yaml'
 class Notifier
   # @todo #7 Tests/ test bot.
   # We have to write integration and unit tests for Notifier class.
-  # @todo #15 Design/ Notifier class.
-  # Remove code duplications where it's possible.
-  # save/update user methods in priority.
   class NotifierError < StandardError; end
 
   def initialize
