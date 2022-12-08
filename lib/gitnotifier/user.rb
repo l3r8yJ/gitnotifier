@@ -26,13 +26,14 @@ require 'yaml'
 # Copyright:: Copyright (c) 2022 Ivanchuck Ivan
 # License:: MIT
 class User
+  class UserException < StandardError; end
   # @todo #7 Tests/ test user.
   # We have to write integration and unit tests for User class.
-  def initialize(id, github)
+  def initialize(id, github = nil)
     @id = id
     @github = github
     config = YAML.load_file('pg.yml')['database']
-    @pgcon = PG.connect(
+    @pgsql = PG.connect(
       host: config['host'],
       user: config['user'],
       password: config['password'],
@@ -41,9 +42,17 @@ class User
   end
 
   def save
-    @pgcon.exec(
+    raise UserExcpetion 'GitHub token is required!' if github.nil?
+    @pgsql.exec(
       'INSERT INTO bot_user(id, token) VALUES ($1, $2)',
       [@id, @github]
+    )
+  end
+
+  def update_token(token)
+    @pgsql.exec(
+      'UPDATE bot_user SET token=$1 WHERE id=$2',
+      [token, @id]
     )
   end
 end
