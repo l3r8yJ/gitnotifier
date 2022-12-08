@@ -13,6 +13,8 @@ release:
     gem push *.gem --config-file ../rubygems.yml
 merge:
   script: |-
+    touch bot.yml
+    echo -e "bot:\n\ttoken: some:token" >> bot.yml
     bundle exec rake
 deploy:
   script: |-
