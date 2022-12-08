@@ -56,7 +56,7 @@ class Notifier
           )
         end
         if message.text.include?('/reset')
-          # @todo #db_on_start:30min Create reset.
+          # @todo #auth:30min Create reset.
           # We have to impelement command which resets the GH token.
         end
       end
