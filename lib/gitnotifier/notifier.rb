@@ -54,17 +54,15 @@ class Notifier
           )
         end
         if message.text.include?('/auth')
-          txt = save_user(message)
           bot.api.send_message(
             chat_id: message.chat.id,
-            text: txt
+            text: save_user(message)
           )
         end
         if message.text.include?('/reset')
-          txt = update_user_token(message)
           bot.api.send_message(
             chat_id: message.chat.id,
-            text: txt
+            text: update_user_token(message)
           )
         end
       end
@@ -76,7 +74,7 @@ class Notifier
   def save_user(message)
     token = token('/auth', message)
     txt = 'Your token successfully registred!'
-    txt = 'Please enter correct token.' unless valid?(token)
+    txt = incorrect_token_txt(txt, token)
     begin
       @logger.info("Trying to register the user #{message.from.id}")
       User.new(message.from.id, token).save if valid?(token)
@@ -90,7 +88,7 @@ class Notifier
   def update_user_token(message)
     token = token('/reset', message)
     txt = 'Token successfully updated!'
-    txt = 'Please enter correct token.' unless valid?(token)
+    txt = incorrect_token_txt(txt, token)
     begin
       @logger.info("Trying to update #{message.from.id} token")
       User.new(message.from.id).update_token(token) if valid?(token)
@@ -98,6 +96,11 @@ class Notifier
       txt = 'Something went wrong...'
       @logger.error(e.to_s)
     end
+    txt
+  end
+
+  def incorrect_token_txt(txt, token)
+    txt = 'Please enter correct token.' unless valid?(token)
     txt
   end
 

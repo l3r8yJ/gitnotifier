@@ -42,7 +42,7 @@ class User
   end
 
   def save
-    raise UserExcpetion 'GitHub token is required!' if github.nil?
+    raise UserExcpetion 'GitHub token is required!' if @github.nil?
     @pgsql.exec(
       'INSERT INTO bot_user(id, token) VALUES ($1, $2)',
       [@id, @github]
