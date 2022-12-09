@@ -54,6 +54,8 @@ class Notifier
       @logger.info('Bot started!')
       thr = Thread.new { Client.new(bot).handle }
       bot.listen do |message|
+        # @todo #22 Bug/ fetch only on success.
+        # Users.fetch must be called only when /auth or /reset was successful.
         if message.text.include?('/start')
           bot.api.send_message(
             chat_id: message.chat.id,
