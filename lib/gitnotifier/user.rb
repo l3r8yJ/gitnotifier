@@ -29,29 +29,31 @@ class User
   class UserError < StandardError; end
   # @todo #7 Tests/ test user.
   # We have to write integration and unit tests for User class.
+  # @todo #13 Design/ The user class must be separated.
+  # It is necessary to decompose into several other classes.
+  attr_reader :id, :token
 
-  attr_reader :id, :github
-
-  def initialize(id, github = nil, pgsql = nil)
+  def initialize(id, token = nil, pgsql = nil)
     @id = id
-    @github = github
+    @token = token
     @pgsql = pgsql
   end
 
   def save
-    check_github
+    check_token
     @pgsql.exec(
       'INSERT INTO bot_user(id, token) VALUES ($1, $2)',
-      [@id, @github]
+      [@id, @token]
     )
   end
 
   def fetch
     check_pgsql
-    @pgsql.exec(
+    r = @pgsql.exec(
       'SELECT * FROM bot_user WHERE id=$1',
       [@id]
     )
+    User.new(r['id'], r['token'], @pgsql)
   end
 
   def update_token(token)
@@ -64,11 +66,11 @@ class User
 
   private
 
-  def chek_github
-    raise UserError, 'GitHub token is required.' if @github.nil?
+  def check_token
+    raise UserError, 'Token token is required.' if @token.nil?
   end
 
   def check_pgsql
-    raise UserError, 'Connection not provided.' if @pgsql.nil?
+    raise UserError, 'No connection to the database is provided.' if @pgsql.nil?
   end
 end

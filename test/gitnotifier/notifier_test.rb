@@ -19,7 +19,6 @@
 # SOFTWARE.
 
 require_relative '../../lib/gitnotifier/notifier'
-
 require 'test_helper'
 require 'gitnotifier/version'
 require 'minitest/autorun'

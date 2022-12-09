@@ -57,14 +57,12 @@ class Notifier
             chat_id: message.chat.id,
             text: @start
           )
-        end
-        if message.text.include?('/auth')
+        elsif message.text.include?('/auth')
           bot.api.send_message(
             chat_id: message.chat.id,
             text: save_user(message)
           )
-        end
-        if message.text.include?('/reset')
+        elsif message.text.include?('/reset')
           bot.api.send_message(
             chat_id: message.chat.id,
             text: update_user_token(message)
@@ -96,7 +94,7 @@ class Notifier
     txt = incorrect_token_txt(txt, token)
     begin
       @logger.info("Trying to update #{message.from.id} token")
-      User.new(id: message.from.id, pgsql: @pgsql).update_token(token) if valid?(token)
+      User.new(message.from.id, token, @pgsql).update_token(token) if valid?(token)
     rescue StandardError => e
       txt = 'Something went wrong...'
       @logger.error(e.to_s)
