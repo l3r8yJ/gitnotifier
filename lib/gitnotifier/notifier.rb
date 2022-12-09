@@ -66,6 +66,8 @@ class Notifier
           )
           thr = reboot(thr, bot)
         elsif message.text.include?('/reset')
+          # @todo #22 Bug/ reset fails.
+          # Handle error when reset was failed same as /auth.
           bot.api.send_message(
             chat_id: message.chat.id,
             text: update_user_token(message)
