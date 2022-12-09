@@ -43,6 +43,9 @@ class Client
     Kernel.loop do
       current = client.notifications({ all: false }).map { |n| n['id'] }
       unless current == before
+        # @todo #22 Bug/ check on new notifications.
+        # Fix the way to check new notifications.
+        # It's should reacts only to new notifications.
         @bot.api.send_message(
           chat_id: user.id,
           text: "[#{client.user.login}] new notification, take a look, please."
