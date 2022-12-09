@@ -26,11 +26,13 @@ require 'veils'
 # Copyright:: Copyright (c) 2022 Ivanchuck Ivan
 # License:: MIT
 class Git
-  def initialize(token)
+  def initialize(token, bot)
     @client = Octokit::Client.new(access_token: token)
+    @bot = bot
   end
 
   def user
-    puts(client.user.to_s)
+    user.login
+    puts(user.to_s)
   end
 end

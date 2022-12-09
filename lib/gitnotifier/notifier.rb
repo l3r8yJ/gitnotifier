@@ -21,6 +21,7 @@
 require_relative 'version'
 require_relative 'user'
 require_relative 'users'
+require_relative 'git'
 require 'telegram/bot'
 require 'yaml'
 
@@ -69,6 +70,10 @@ class Notifier
           )
         end
       end
+      Users.new.fetch.each {
+        |u|
+          Git.new(u.token, bot).user
+      }
     end
   end
 
