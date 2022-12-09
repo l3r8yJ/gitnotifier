@@ -26,33 +26,45 @@ require 'yaml'
 # Copyright:: Copyright (c) 2022 Ivanchuck Ivan
 # License:: MIT
 class User
-  class UserException < StandardError; end
+  class UserError < StandardError; end
   # @todo #7 Tests/ test user.
   # We have to write integration and unit tests for User class.
-  def initialize(id, github = nil)
+
+  attr_reader :id, :github
+
+  def initialize(id, github = nil, pgsql = nil)
     @id = id
     @github = github
-    config = YAML.load_file('pg.yml')['database']
-    @pgsql = PG.connect(
-      host: config['host'],
-      user: config['user'],
-      password: config['password'],
-      dbname: config['schema']
-    )
+    @pgsql = pgsql
   end
 
   def save
-    raise UserExcpetion 'GitHub token is required!' if @github.nil?
+    raise UserError, 'GitHub token is required.' if @github.nil?
     @pgsql.exec(
       'INSERT INTO bot_user(id, token) VALUES ($1, $2)',
       [@id, @github]
     )
   end
 
+  def fetch
+    check_pgsql
+    @pgsql.exec(
+      'SELECT * FROM bot_user WHERE id=$1',
+      [@id]
+    )
+  end
+
   def update_token(token)
+    check_pgsql
     @pgsql.exec(
       'UPDATE bot_user SET token=$1 WHERE id=$2',
       [token, @id]
     )
+  end
+
+  private
+
+  def check_pgsql
+    raise UserError, 'Connection not provided.' if @pgsql.nil?
   end
 end

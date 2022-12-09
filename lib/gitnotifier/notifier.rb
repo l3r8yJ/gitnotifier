@@ -20,6 +20,7 @@
 
 require_relative 'version'
 require_relative 'user'
+require_relative 'users'
 require 'telegram/bot'
 require 'yaml'
 
@@ -33,8 +34,15 @@ class Notifier
   class NotifierError < StandardError; end
 
   def initialize
-    @token = YAML.load_file('bot.yml')['bot']['token']
+    config = YAML.load_file('.notifier.yml')
+    @token = config['bot']['token']
     @logger = Logger.new($stdout)
+    @pgsql = PG.connect(
+      host: config['database']['host'],
+      user: config['database']['user'],
+      password: config['database']['password'],
+      dbname: config['database']['schema']
+    )
     @start = '
     Hello, i\'ll notify you! Please, send /auth YOUR_TOKEN to authorize and /reset YOUR_TOKEN to set new.
     '
@@ -74,7 +82,7 @@ class Notifier
     txt = incorrect_token_txt(txt, token)
     begin
       @logger.info("Trying to register the user #{message.from.id}")
-      User.new(message.from.id, token).save if valid?(token)
+      User.new(message.from.id, token, @pgsql).save if valid?(token)
     rescue PG::UniqueViolation => e
       txt = 'You already registred your token!'
       @logger.error("Error: #{e}")
@@ -88,8 +96,8 @@ class Notifier
     txt = incorrect_token_txt(txt, token)
     begin
       @logger.info("Trying to update #{message.from.id} token")
-      User.new(message.from.id).update_token(token) if valid?(token)
-    rescue StandartError => e
+      User.new(id: message.from.id, pgsql: @pgsql).update_token(token) if valid?(token)
+    rescue StandardError => e
       txt = 'Something went wrong...'
       @logger.error(e.to_s)
     end
