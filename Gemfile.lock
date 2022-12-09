@@ -76,6 +76,7 @@ DEPENDENCIES
   git-notifier!
   minitest (~> 5.0)
   octokit (~> 6.0.1)
+  parallel (~> 1.22, >= 1.22.1)
   pg (~> 1.4.5)
   rake (~> 13.0)
   rubocop (~> 0.80)

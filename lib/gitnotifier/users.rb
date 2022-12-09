@@ -36,7 +36,8 @@ class Users
     )
   end
 
-  def all
+  def fetch
+    puts('fetching...')
     @pgsql.exec('SELECT * FROM bot_user').map do |u|
         User.new(u['id'].to_i, u['token'], @pgsql)
     end

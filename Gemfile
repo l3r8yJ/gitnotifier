@@ -20,3 +20,5 @@ gem 'faraday', '~> 2.7', '>= 2.7.1'
 gem 'sawyer', '~> 0.9.2'
 
 gem 'veils', '~> 0.3.0'
+
+gem 'parallel', '~> 1.22', '>= 1.22.1'

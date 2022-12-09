@@ -19,6 +19,7 @@
 # SOFTWARE.
 
 require 'octokit'
+require 'parallel'
 
 # Client class.
 # Author:: Ivanchuk Ivan (clicker.heroes.acg@gmail.com)
@@ -31,24 +32,22 @@ class Client
   end
 
   def handle
-    Users.new.all.each { |u| Thread.new(handle_single(u)) }
+    users = Users.new.fetch
+    @logger.info(users.map(&:id))
+    Parallel.each(users, in_threads: users.size) { |u| handle_single(u) }
   end
 
   def handle_single(user)
     client = Octokit::Client.new(access_token: user.token)
     before = client.notifications({ all: false }).map { |n| n['id'] }
     Kernel.loop do
-      @logger.info("Checking updates for #{user.id}")
       current = client.notifications({ all: false }).map { |n| n['id'] }
-      @logger.info(current)
-      @logger.info(client.notifications({ all: false }))
       unless current == before
         @bot.api.send_message(
           chat_id: user.id,
-          text: 'You got new notification, take a look, please.'
+          text: "[#{client.user.login}] new notification, take a look, please."
         )
         before = current
-        @logger.info("b: #{before}")
       end
       sleep(2)
     end

@@ -52,7 +52,7 @@ class Notifier
   def run
     Telegram::Bot::Client.run(@token) do |bot|
       @logger.info('Bot started!')
-      Thread.new { Client.new(bot).handle }
+      thr = Thread.new { Client.new(bot).handle }
       bot.listen do |message|
         if message.text.include?('/start')
           bot.api.send_message(
@@ -64,17 +64,24 @@ class Notifier
             chat_id: message.chat.id,
             text: save_user(message)
           )
+          thr = reboot(thr, bot)
         elsif message.text.include?('/reset')
           bot.api.send_message(
             chat_id: message.chat.id,
             text: update_user_token(message)
           )
+          thr = reboot(thr, bot)
         end
       end
     end
   end
 
   private
+
+  def reboot(thread, bot)
+    thread.kill
+    Thread.new { Client.new(bot).handle }
+  end
 
   def save_user(message)
     token = token('/auth', message)
