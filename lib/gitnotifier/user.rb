@@ -41,6 +41,7 @@ class User
 
   def save
     check_token
+    check_pgsql
     @pgsql.exec(
       'INSERT INTO bot_user(id, token) VALUES ($1, $2)',
       [@id, @token]

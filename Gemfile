@@ -13,6 +13,6 @@ gem 'telegram-bot-ruby', '~> 0.23.0'
 
 gem 'pg', '~> 1.4.5'
 
-gem 'octokit', '~> 5.0'
+gem 'octokit', '~> 6.0.1'
 
 gem 'veils', '~> 0.3.0'

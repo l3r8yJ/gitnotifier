@@ -21,18 +21,13 @@
 require 'octokit'
 require 'veils'
 
-# Git class.
+# Client class.
 # Author:: Ivanchuk Ivan (clicker.heroes.acg@gmail.com)
 # Copyright:: Copyright (c) 2022 Ivanchuck Ivan
 # License:: MIT
-class Git
+class Client
   def initialize(token, bot)
     @client = Octokit::Client.new(access_token: token)
     @bot = bot
-  end
-
-  def user
-    user.login
-    puts(user.to_s)
   end
 end
