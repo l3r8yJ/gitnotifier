@@ -21,54 +21,24 @@
 require 'pg'
 require 'yaml'
 
-# The user class.
+# The users class.
 # Author:: Ivanchuk Ivan (clicker.heroes.acg@gmail.com)
 # Copyright:: Copyright (c) 2022 Ivanchuck Ivan
 # License:: MIT
-class User
-  class UserError < StandardError; end
-  # @todo #7 Tests/ test user.
-  # We have to write integration and unit tests for User class.
-
-  attr_reader :id, :github
-
-  def initialize(id, github = nil, pgsql = nil)
-    @id = id
-    @github = github
-    @pgsql = pgsql
-  end
-
-  def save
-    check_github
-    @pgsql.exec(
-      'INSERT INTO bot_user(id, token) VALUES ($1, $2)',
-      [@id, @github]
+class Users
+  def initialize
+    config = YAML.load_file('pg.yml')['database']
+    @pgsql = PG.connect(
+      host: config['host'],
+      user: config['user'],
+      password: config['password'],
+      dbname: config['schema']
     )
   end
 
   def fetch
-    check_pgsql
-    @pgsql.exec(
-      'SELECT * FROM bot_user WHERE id=$1',
-      [@id]
-    )
-  end
-
-  def update_token(token)
-    check_pgsql
-    @pgsql.exec(
-      'UPDATE bot_user SET token=$1 WHERE id=$2',
-      [token, @id]
-    )
-  end
-
-  private
-
-  def chek_github
-    raise UserError, 'GitHub token is required.' if @github.nil?
-  end
-
-  def check_pgsql
-    raise UserError, 'Connection not provided.' if @pgsql.nil?
+    @pgsql.exec('SELECT * FROM bot_user').map do |u|
+        User.new(u['id'].to_i, u['token'], @pgsql)
+    end
   end
 end
