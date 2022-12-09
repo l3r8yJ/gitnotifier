@@ -27,7 +27,7 @@ require 'yaml'
 # License:: MIT
 class Users
   def initialize
-    config = YAML.load_file('pg.yml')['database']
+    config = YAML.load_file('.notifier.yml')['database']
     @pgsql = PG.connect(
       host: config['host'],
       user: config['user'],
@@ -36,7 +36,7 @@ class Users
     )
   end
 
-  def fetch
+  def all
     @pgsql.exec('SELECT * FROM bot_user').map do |u|
         User.new(u['id'].to_i, u['token'], @pgsql)
     end

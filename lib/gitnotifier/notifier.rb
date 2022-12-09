@@ -21,6 +21,7 @@
 require_relative 'version'
 require_relative 'user'
 require_relative 'users'
+require_relative 'client'
 require 'telegram/bot'
 require 'yaml'
 
@@ -51,6 +52,7 @@ class Notifier
   def run
     Telegram::Bot::Client.run(@token) do |bot|
       @logger.info('Bot started!')
+      Thread.new { Client.new(bot).handle }
       bot.listen do |message|
         if message.text.include?('/start')
           bot.api.send_message(
@@ -69,8 +71,6 @@ class Notifier
           )
         end
       end
-      # @todo #13 Fix git class.
-      # Here we got a problem when trying to "require_relative 'client'".
     end
   end
 

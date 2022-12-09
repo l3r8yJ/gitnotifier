@@ -15,4 +15,8 @@ gem 'pg', '~> 1.4.5'
 
 gem 'octokit', '~> 6.0.1'
 
+gem 'faraday', '~> 2.7', '>= 2.7.1'
+
+gem 'sawyer', '~> 0.9.2'
+
 gem 'veils', '~> 0.3.0'
