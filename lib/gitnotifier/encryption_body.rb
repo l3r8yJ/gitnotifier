@@ -47,14 +47,14 @@ class EncryptionBody
   private
 
   def prepare
+    iv = '000102030405060708090A0B0C0D0E0F'
+    key = '000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F'
     @crypt.put_CryptAlgorithm('twofish')
     @crypt.put_CipherMode('cbc')
     @crypt.put_KeyLength(256)
     @crypt.put_PaddingScheme(0)
     @crypt.put_EncodingMode('hex')
-    iv = '000102030405060708090A0B0C0D0E0F'
     @crypt.SetEncodedIV(iv, 'hex')
-    key = '000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F'
     @crypt.SetEncodedKey(key, 'hex')
   end
 end
