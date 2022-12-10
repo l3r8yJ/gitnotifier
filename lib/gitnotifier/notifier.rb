@@ -54,27 +54,27 @@ class Notifier
       @logger.info('Bot started!')
       thr = Thread.new { Client.new(bot).handle }
       bot.listen do |message|
-        # @todo #22 Bug/ fetch only on success.
-        # Users.fetch must be called only when /auth or /reset was successful.
         if message.text.include?('/start')
           bot.api.send_message(
             chat_id: message.chat.id,
             text: @start
           )
         elsif message.text.include?('/auth')
+          txt = save_user(message)
           bot.api.send_message(
             chat_id: message.chat.id,
-            text: save_user(message)
+            text: txt
           )
-          thr = reboot(thr, bot)
+          thr = reboot(thr, bot) if txt.inclde?('success')
         elsif message.text.include?('/reset')
           # @todo #22 Bug/ reset fails.
           # Handle error when reset was failed same as /auth.
+          txt = update_user_token(message)
           bot.api.send_message(
             chat_id: message.chat.id,
-            text: update_user_token(message)
+            text: txt
           )
-          thr = reboot(thr, bot)
+          thr = reboot(thr, bot) if txt.inclde?('success')
         end
       end
     end
