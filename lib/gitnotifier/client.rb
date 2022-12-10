@@ -42,8 +42,7 @@ class Client
     before = client.notifications({ all: false }).map { |n| n['id'] }
     Kernel.loop do
       current = client.notifications({ all: false }).map { |n| n['id'] }
-      diff = current - before
-      unless diff.empty?
+      unless (current - before).empty?
         @bot.api.send_message(
           chat_id: user.id,
           text: "[#{client.user.login}] new notifications, take a look, please."
