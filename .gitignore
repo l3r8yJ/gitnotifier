@@ -16,3 +16,4 @@ rdoc/
 .sass-cache/
 *.iml
 .notifier.yml
+Gemfile.lock
