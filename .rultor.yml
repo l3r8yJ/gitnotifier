@@ -15,6 +15,8 @@ release:
     gem push *.gem --config-file ../rubygems.yml
 merge:
   script: |-
+    gem install bundler
+    bundle update
     bundle install
     bundle exec rake
 deploy:
