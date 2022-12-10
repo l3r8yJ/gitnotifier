@@ -44,9 +44,6 @@ class Client
       current = client.notifications({ all: false }).map { |n| n['id'] }
       diff = current - before
       unless diff.empty?
-        # @todo #22 Bug/ check on new notifications.
-        # Fix the way to check new notifications.
-        # It's should reacts only to new notifications.
         @bot.api.send_message(
           chat_id: user.id,
           text: "[#{client.user.login}] new notifications, take a look, please."
