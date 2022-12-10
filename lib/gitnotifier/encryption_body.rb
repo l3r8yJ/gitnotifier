@@ -24,7 +24,7 @@ require 'chilkat'
 # Author:: Ivanchuk Ivan (clicker.heroes.acg@gmail.com)
 # Copyright:: Copyright (c) 2022 Ivanchuck Ivan
 # License:: MIT
-# @todo: #24 Code/ safety.
+# @todo: #24 Tokens safety.
 # Encrypt tokens before storing them in the database,
 # and decrypt them after receiving them.
 class EncryptionBody
