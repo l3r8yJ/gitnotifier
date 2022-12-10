@@ -18,42 +18,40 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-require 'octokit'
-require 'parallel'
+require 'chilkat'
 
-# Client class.
+# EcnryptionBody class.
 # Author:: Ivanchuk Ivan (clicker.heroes.acg@gmail.com)
 # Copyright:: Copyright (c) 2022 Ivanchuck Ivan
 # License:: MIT
-class Client
-  def initialize(bot)
-    @bot = bot
-    @logger = Logger.new($stdout)
+class EncryptionBody
+  attr_reader :crypt
+
+  def initialize(token)
+    @token = token
+    @crypt = Chilkat::CkCrypt2.new
+    prepare
   end
 
-  def handle
-    users = Users.new.fetch
-    @logger.info(users.map(&:id))
-    Parallel.each(users, in_threads: users.size) { |u| handle_single(u) }
+  def encrypted
+    @crypt.encryptStringENC(@token)
   end
 
-  def handle_single(user)
-    client = Octokit::Client.new(access_token: user.token)
-    before = client.notifications({ all: false }).map { |n| n['id'] }
-    Kernel.loop do
-      current = client.notifications({ all: false }).map { |n| n['id'] }
-      diff = current - before
-      unless diff.empty?
-        # @todo #22 Bug/ check on new notifications.
-        # Fix the way to check new notifications.
-        # It's should reacts only to new notifications.
-        @bot.api.send_message(
-          chat_id: user.id,
-          text: "[#{client.user.login}] new notifications, take a look, please."
-        )
-        before = current
-      end
-      sleep(2)
-    end
+  def decrypted(encrypted)
+    @crypt.decryptStringENC(encrypted)
+  end
+
+  private
+
+  def prepare
+    @crypt.put_CryptAlgorithm('twofish')
+    @crypt.put_CipherMode('cbc')
+    @crypt.put_KeyLength(256)
+    @crypt.put_PaddingScheme(0)
+    @crypt.put_EncodingMode('hex')
+    iv = '000102030405060708090A0B0C0D0E0F'
+    @crypt.SetEncodedIV(iv, 'hex')
+    key = '000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F'
+    @crypt.SetEncodedKey(key, 'hex')
   end
 end

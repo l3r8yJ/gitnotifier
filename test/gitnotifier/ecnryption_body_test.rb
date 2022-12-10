@@ -18,42 +18,23 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-require 'octokit'
-require 'parallel'
+require_relative '../../lib/gitnotifier/encryption_body'
+require 'test_helper'
+require 'gitnotifier/version'
+require 'minitest/autorun'
 
-# Client class.
+# Test for EcnryptedToken class.
 # Author:: Ivanchuk Ivan (clicker.heroes.acg@gmail.com)
 # Copyright:: Copyright (c) 2022 Ivanchuck Ivan
 # License:: MIT
-class Client
-  def initialize(bot)
-    @bot = bot
-    @logger = Logger.new($stdout)
-  end
 
-  def handle
-    users = Users.new.fetch
-    @logger.info(users.map(&:id))
-    Parallel.each(users, in_threads: users.size) { |u| handle_single(u) }
-  end
-
-  def handle_single(user)
-    client = Octokit::Client.new(access_token: user.token)
-    before = client.notifications({ all: false }).map { |n| n['id'] }
-    Kernel.loop do
-      current = client.notifications({ all: false }).map { |n| n['id'] }
-      diff = current - before
-      unless diff.empty?
-        # @todo #22 Bug/ check on new notifications.
-        # Fix the way to check new notifications.
-        # It's should reacts only to new notifications.
-        @bot.api.send_message(
-          chat_id: user.id,
-          text: "[#{client.user.login}] new notifications, take a look, please."
-        )
-        before = current
-      end
-      sleep(2)
-    end
+class EncryptedTokenTest < MiniTest::Test
+  def test_ecnryption_decryption
+    token = 'ghg_ASkn2Kjkd1413kaSd'
+    encrypter = EncryptionBody.new(token)
+    assert_equal(
+      true,
+      encrypter.decrypted(encrypter.encrypted).eql?(token)
+    )
   end
 end

@@ -22,3 +22,5 @@ gem 'sawyer', '~> 0.9.2'
 gem 'veils', '~> 0.3.0'
 
 gem 'parallel', '~> 1.22', '>= 1.22.1'
+
+gem 'chilkat', '~> 9.5'
