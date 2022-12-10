@@ -65,16 +65,14 @@ class Notifier
             chat_id: message.chat.id,
             text: txt
           )
-          thr = reboot(thr, bot) if txt.inclde?('success')
+          thr = reboot(thr, bot) if txt.include?('success')
         elsif message.text.include?('/reset')
-          # @todo #22 Bug/ reset fails.
-          # Handle error when reset was failed same as /auth.
           txt = update_user_token(message)
           bot.api.send_message(
             chat_id: message.chat.id,
             text: txt
           )
-          thr = reboot(thr, bot) if txt.inclde?('success')
+          thr = reboot(thr, bot) if txt.include?('success')
         end
       end
     end
@@ -106,10 +104,19 @@ class Notifier
     txt = 'Token successfully updated!'
     txt = incorrect_token_txt(txt, token)
     begin
-      @logger.info("Trying to update #{message.from.id} token")
-      User.new(message.from.id, token, @pgsql).update_token(token) if valid?(token)
-    rescue StandardError => e
-      txt = 'Something went wrong...'
+      if valid?(token)
+        @logger.info("Trying to update #{message.from.id} token")
+        User.new(
+          message.from.id,
+          token,
+          @pgsql
+        )
+        .fetch
+        .update_token(token)
+        @logger.info("Token for #{message.from.id} updated")
+      end
+    rescue KeyError => e
+      txt = 'You\'re not registered, please use /auth'
       @logger.error(e.to_s)
     end
     txt

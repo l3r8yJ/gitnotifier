@@ -54,7 +54,8 @@ class User
       'SELECT * FROM bot_user WHERE id=$1',
       [@id]
     )
-    User.new(r['id'], r['token'], @pgsql)
+    raise KeyError, 'User not found' if r.values.empty?
+    User.new(r[0]['id'].to_i, r[0]['token'], @pgsql)
   end
 
   def update_token(token)
