@@ -24,6 +24,9 @@ require 'chilkat'
 # Author:: Ivanchuk Ivan (clicker.heroes.acg@gmail.com)
 # Copyright:: Copyright (c) 2022 Ivanchuck Ivan
 # License:: MIT
+# @todo #28 Decompose class.
+# Decompose this class into two decorators for string.
+# First should be Encrypted, second one should be Decrypted
 class EncryptionBody
   def initialize(token)
     @token = token
@@ -42,6 +45,8 @@ class EncryptionBody
   private
 
   def prepare
+    # @todo #28 Take out the keys.
+    # Take out the iv and key into .yml configuration.
     iv = '000102030405060708090A0B0C0D0E0F'
     key = '000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F'
     @crypt.put_CryptAlgorithm('twofish')
