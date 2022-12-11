@@ -59,7 +59,7 @@ class User
       [@id]
     )
     @token = EncryptionBody.new(@token).encrypted
-    raise KeyError, 'User not found' if r.values.empty?
+    raise KeyError, 'User not found' if records.values.empty?
     User.new(
       records[0]['id'].to_i,
       EncryptionBody.new(

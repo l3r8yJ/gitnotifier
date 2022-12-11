@@ -42,10 +42,20 @@ class Client
     before = client.notifications({ all: false }).map { |n| n['id'] }
     Kernel.loop do
       current = client.notifications({ all: false }).map { |n| n['id'] }
-      unless (current - before).empty?
+      diff = current - before
+      unless diff.empty?
+        updates = client.notifications({ all: false }).map { |n| n if diff.include?(n['id']) }
+        txt = "[#{client.user.login}] new [notification](https://github.com/notifications):\n"
+        updates.each do |update|
+          txt.concat(
+            "New #{update.reason} in #{update.subject.type}.\n"
+          )
+        end
+        txt.concat('Take a look, please.')
         @bot.api.send_message(
           chat_id: user.id,
-          text: "[#{client.user.login}] new notifications, take a look, please."
+          text: txt,
+          parse_mode: 'Markdown'
         )
         before = current
       end
