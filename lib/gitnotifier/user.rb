@@ -18,6 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+require_relative 'encryption_body'
 require 'pg'
 require 'yaml'
 
@@ -44,25 +45,38 @@ class User
     check_pgsql
     @pgsql.exec(
       'INSERT INTO bot_user(id, token) VALUES ($1, $2)',
-      [@id, @token]
+      [
+        @id,
+        EncryptionBody.new(@token).encrypted
+      ]
     )
   end
 
   def fetch
     check_pgsql
-    r = @pgsql.exec(
+    records = @pgsql.exec(
       'SELECT * FROM bot_user WHERE id=$1',
       [@id]
     )
+    @token = EncryptionBody.new(@token).encrypted
     raise KeyError, 'User not found' if r.values.empty?
-    User.new(r[0]['id'].to_i, r[0]['token'], @pgsql)
+    User.new(
+      records[0]['id'].to_i,
+      EncryptionBody.new(
+        records[0]['token']
+      ).decrypted,
+      @pgsql
+    )
   end
 
   def update_token(token)
     check_pgsql
     @pgsql.exec(
       'UPDATE bot_user SET token=$1 WHERE id=$2',
-      [token, @id]
+      [
+        EncryptionBody.new(token).encrypted,
+        @id
+      ]
     )
   end
 

@@ -28,8 +28,6 @@ require 'chilkat'
 # Encrypt tokens before storing them in the database,
 # and decrypt them after receiving them.
 class EncryptionBody
-  attr_reader :crypt
-
   def initialize(token)
     @token = token
     @crypt = Chilkat::CkCrypt2.new
@@ -40,8 +38,8 @@ class EncryptionBody
     @crypt.encryptStringENC(@token)
   end
 
-  def decrypted(encrypted)
-    @crypt.decryptStringENC(encrypted)
+  def decrypted
+    @crypt.decryptStringENC(@token)
   end
 
   private

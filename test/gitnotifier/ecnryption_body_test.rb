@@ -31,10 +31,10 @@ require 'minitest/autorun'
 class EncryptedTokenTest < MiniTest::Test
   def test_ecnryption_decryption
     token = 'ghg_ASkn2Kjkd1413kaSd'
-    encrypter = EncryptionBody.new(token)
+    encrypted = EncryptionBody.new(token).encrypted
     assert_equal(
       true,
-      encrypter.decrypted(encrypter.encrypted).eql?(token)
+      EncryptionBody.new(encrypted).decrypted.eql?(token)
     )
   end
 end

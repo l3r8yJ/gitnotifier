@@ -39,7 +39,11 @@ class Users
   def fetch
     puts('fetching...')
     @pgsql.exec('SELECT * FROM bot_user').map do |u|
-      User.new(u['id'].to_i, u['token'], @pgsql)
+      User.new(
+        u['id'].to_i,
+        EncryptionBody.new(u['token']).decrypted,
+        @pgsql
+      )
     end
   end
 end
