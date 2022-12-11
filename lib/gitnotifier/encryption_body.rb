@@ -19,6 +19,7 @@
 # SOFTWARE.
 
 require 'chilkat'
+require 'yaml'
 
 # EcnryptionBody class.
 # Author:: Ivanchuk Ivan (clicker.heroes.acg@gmail.com)
@@ -28,7 +29,8 @@ require 'chilkat'
 # Decompose this class into two decorators for string.
 # First should be Encrypted, second one should be Decrypted
 class EncryptionBody
-  def initialize(token)
+  def initialize(token, config = nil)
+    @config = YAML.load_file('.notifier.yml') if config.nil?
     @token = token
     @crypt = Chilkat::CkCrypt2.new
     prepare
@@ -45,10 +47,8 @@ class EncryptionBody
   private
 
   def prepare
-    # @todo #28 Take out the keys.
-    # Take out the iv and key into .yml configuration.
-    iv = '000102030405060708090A0B0C0D0E0F'
-    key = '000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F'
+    iv = @config['enc']['iv']
+    key = @config['enc']['iv']
     @crypt.put_CryptAlgorithm('twofish')
     @crypt.put_CipherMode('cbc')
     @crypt.put_KeyLength(256)
