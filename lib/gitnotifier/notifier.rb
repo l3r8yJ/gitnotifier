@@ -81,7 +81,6 @@ class Notifier
       chat_id: message.chat.id,
       text: txt
     )
-    reboot_process(bot) if txt.include?('success')
   end
 
   def auth?(message)
@@ -94,7 +93,6 @@ class Notifier
       chat_id: message.chat.id,
       text: txt
     )
-    reboot_process(bot) if txt.include?('success')
   end
 
   def reset?(message)
@@ -112,7 +110,10 @@ class Notifier
     txt = incorrect_token_txt(txt, token)
     begin
       @logger.info("Trying to register the user #{message.from.id}")
-      User.new(message.from.id, token, @pgsql).save if valid?(token)
+      if valid?(token)
+        User.new(message.from.id, token, @pgsql).save
+        reboot_process(bot)
+      end
     rescue PG::UniqueViolation => e
       txt = 'You already registred your token!'
       @logger.error("Error: #{e}")
@@ -127,14 +128,8 @@ class Notifier
     begin
       if valid?(token)
         @logger.info("Trying to update #{message.from.id} token")
-        User.new(
-          message.from.id,
-          token,
-          @pgsql
-        )
-        .fetch
-        .update_token(token)
-        @logger.info("Token for #{message.from.id} updated")
+        User.new(message.from.id, token, @pgsql).fetch.update_token(token)
+        reboot_process(bot)
       end
     rescue KeyError => e
       txt = 'You\'re not registered, please use /auth'
