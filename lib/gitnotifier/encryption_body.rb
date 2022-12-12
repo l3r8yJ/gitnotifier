@@ -55,11 +55,9 @@ class EncryptionBody
     if @config.nil?
       iv += read_config_from_file[0]
       key += read_config_from_file[1]
-    elsif
-      iv += read_own_config[0]
+    elsif iv += read_own_config[0]
       key += read_own_config[1]
     end
-    fill_iv_and_key(iv, key)
     @crypt.put_CryptAlgorithm('twofish')
     @crypt.put_CipherMode('cbc')
     @crypt.put_KeyLength(256)
