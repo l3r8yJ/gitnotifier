@@ -22,7 +22,7 @@ require_relative 'encryption_body'
 require 'chilkat'
 require 'yaml'
 
-# EcnryptedToken class.
+# DecryptedToken class.
 # Author:: Ivanchuk Ivan (clicker.heroes.acg@gmail.com)
 # Copyright:: Copyright (c) 2022 Ivanchuck Ivan
 # License:: MIT
