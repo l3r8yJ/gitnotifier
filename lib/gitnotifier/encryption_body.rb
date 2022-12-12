@@ -25,26 +25,11 @@ require 'yaml'
 # Author:: Ivanchuk Ivan (clicker.heroes.acg@gmail.com)
 # Copyright:: Copyright (c) 2022 Ivanchuck Ivan
 # License:: MIT
-# @todo #28 Decompose class.
-# Decompose this class into two decorators for string.
-# First should be Encrypted, second one should be Decrypted
 class EncryptionBody
-  # @param token [String]
-  # @param config [YAML]
   def initialize(token, config = nil)
     @config = config
     @token = token
     @crypt = Chilkat::CkCrypt2.new
-  end
-
-  def encrypted
-    prepare
-    @crypt.encryptStringENC(@token)
-  end
-
-  def decrypted
-    prepare
-    @crypt.decryptStringENC(@token)
   end
 
   private

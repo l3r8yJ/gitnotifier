@@ -18,7 +18,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-require_relative 'encryption_body'
+require_relative 'encrypted_token'
+require_relative 'decrypted_token'
 require 'pg'
 require 'yaml'
 
@@ -54,17 +55,14 @@ class User
 
   def fetch
     check_pgsql
-    records = @pgsql.exec(
+    record = @pgsql.exec(
       'SELECT * FROM bot_user WHERE id=$1',
       [@id]
-    )
-    @token = EncryptionBody.new(@token).encrypted
-    raise KeyError, 'User not found' if records.values.empty?
+    )[0]
+    raise KeyError, 'User not found' if record.values.empty?
     User.new(
-      records[0]['id'].to_i,
-      EncryptionBody.new(
-        records[0]['token']
-      ).decrypted,
+      record['id'].to_i,
+      DecryptedToken.new(record['token']).to_s,
       @pgsql
     )
   end
@@ -74,7 +72,7 @@ class User
     @pgsql.exec(
       'UPDATE bot_user SET token=$1 WHERE id=$2',
       [
-        EncryptionBody.new(token).encrypted,
+        EncryptedToken.new(token).to_s,
         @id
       ]
     )

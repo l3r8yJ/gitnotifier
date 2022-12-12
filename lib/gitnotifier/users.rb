@@ -18,6 +18,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+require_relative 'user'
+require_relative 'decrypted_token'
 require 'pg'
 require 'yaml'
 
@@ -37,11 +39,10 @@ class Users
   end
 
   def fetch
-    puts('fetching...')
     @pgsql.exec('SELECT * FROM bot_user').map do |u|
       User.new(
         u['id'].to_i,
-        EncryptionBody.new(u['token']).decrypted,
+        DecryptedToken.new(u['token']).to_s,
         @pgsql
       )
     end
