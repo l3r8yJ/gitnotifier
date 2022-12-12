@@ -52,6 +52,13 @@ class EncryptionBody
   def prepare
     iv = ''
     key = ''
+    if @config.nil?
+      iv += read_config_from_file[0]
+      key += read_config_from_file[1]
+    elsif
+      iv += read_own_config[0]
+      key += read_own_config[1]
+    end
     fill_iv_and_key(iv, key)
     @crypt.put_CryptAlgorithm('twofish')
     @crypt.put_CipherMode('cbc')
@@ -60,16 +67,6 @@ class EncryptionBody
     @crypt.put_EncodingMode('hex')
     @crypt.SetEncodedIV(iv, 'hex')
     @crypt.SetEncodedKey(key, 'hex')
-  end
-
-  def fill_iv_and_key(iv, key)
-    if @config.nil?
-      iv += read_config_from_file[0]
-      key += read_config_from_file[1]
-    elsif
-      iv += read_own_config[0]
-      key += read_own_config[1]
-    end
   end
 
   def read_config_from_file
