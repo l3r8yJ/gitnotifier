@@ -38,6 +38,8 @@ class Client
     ) { |user| handle_single(user) }
   end
 
+  private
+
   def handle_single(user)
     client = Octokit::Client.new(access_token: user.token)
     before = notifications(client)
