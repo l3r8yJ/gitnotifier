@@ -55,7 +55,7 @@ class Notifier
       @logger.info('Bot started!')
       @process = Thread.new { Client.new(bot).handle }
       bot.listen do |message|
-        send_start_text(bot, message) if start?(message)
+        send_start_message(bot, message) if start?(message)
         send_auth_message(bot, message) if auth?(message)
         send_reset_message(bot, message) if reset?(message)
       end
@@ -64,7 +64,7 @@ class Notifier
 
   private
 
-  def send_start_text(bot, message)
+  def send_start_message(bot, message)
     bot.api.send_message(
       chat_id: message.chat.id,
       text: START
