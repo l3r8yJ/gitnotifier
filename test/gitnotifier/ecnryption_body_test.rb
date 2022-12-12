@@ -20,6 +20,9 @@
 
 require_relative '../../lib/gitnotifier/encryption_body'
 require 'test_helper'
+require 'tmpdir'
+require 'tempfile'
+require 'yaml'
 require 'gitnotifier/version'
 require 'minitest/autorun'
 
@@ -30,11 +33,21 @@ require 'minitest/autorun'
 
 class EncryptedTokenTest < MiniTest::Test
   def test_ecnryption_decryption
+    y = {
+      enc: {
+        iv: '034136030405060704020A0B0C0D0E0F',
+        key: '000102030405215535124A0B0C0D0E0F101112131415161718191A1B1C1D1E1F'
+      }
+    }.to_yaml
     token = 'ghg_ASkn2Kjkd1413kaSd'
-    encrypted = EncryptionBody.new(token).encrypted
+    config = YAML.safe_load(
+      y,
+      permitted_classes: [Symbol]
+    )
+    encrypted = EncryptionBody.new(token, config).encrypted
     assert_equal(
       true,
-      EncryptionBody.new(encrypted).decrypted.eql?(token)
+      EncryptionBody.new(encrypted, config).decrypted.eql?(token)
     )
   end
 end

@@ -29,26 +29,30 @@ require 'yaml'
 # Decompose this class into two decorators for string.
 # First should be Encrypted, second one should be Decrypted
 class EncryptionBody
+  # @param token [String]
+  # @param config [YAML]
   def initialize(token, config = nil)
-    @config = YAML.load_file('.notifier.yml') if config.nil?
+    @config = config
     @token = token
     @crypt = Chilkat::CkCrypt2.new
-    prepare
   end
 
   def encrypted
+    prepare
     @crypt.encryptStringENC(@token)
   end
 
   def decrypted
+    prepare
     @crypt.decryptStringENC(@token)
   end
 
   private
 
   def prepare
-    iv = @config['enc']['iv']
-    key = @config['enc']['iv']
+    iv = ''
+    key = ''
+    fill_iv_and_key(iv, key)
     @crypt.put_CryptAlgorithm('twofish')
     @crypt.put_CipherMode('cbc')
     @crypt.put_KeyLength(256)
@@ -56,5 +60,24 @@ class EncryptionBody
     @crypt.put_EncodingMode('hex')
     @crypt.SetEncodedIV(iv, 'hex')
     @crypt.SetEncodedKey(key, 'hex')
+  end
+
+  def fill_iv_and_key(iv, key)
+    if @config.nil?
+      iv += read_config_from_file[0]
+      key += read_config_from_file[1]
+    elsif
+      iv += read_own_config[0]
+      key += read_own_config[1]
+    end
+  end
+
+  def read_config_from_file
+    @config = YAML.load_file('.notifier.yml')
+    [@config['enc']['iv'], @config['enc']['key']]
+  end
+
+  def read_own_config
+    [@config[:enc][:iv], @config[:enc][:key]]
   end
 end
