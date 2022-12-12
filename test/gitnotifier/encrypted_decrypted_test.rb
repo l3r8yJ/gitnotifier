@@ -36,14 +36,14 @@ class EncryptedDecryptedTokenTest < MiniTest::Test
   def test_ecnrypted_token
     refute_same(
       token,
-      EncryptedToken.new(token).to_s
+      EncryptedToken.new(token, config).to_s
     )
   end
 
   def test_decrypted_token
     refute_same(
       token,
-      DecryptedToken.new(token).to_s
+      DecryptedToken.new(token, config).to_s
     )
   end
 
