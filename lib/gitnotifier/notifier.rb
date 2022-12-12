@@ -34,6 +34,10 @@ class Notifier
   # We have to write integration and unit tests for Notifier class.
   class NotifierError < StandardError; end
 
+  START = '
+  Hello, i\'ll notify you! Please, send /auth YOUR_TOKEN to authorize and /reset YOUR_TOKEN to set new.
+  '.freeze
+
   def initialize
     config = YAML.load_file('.notifier.yml')
     @token = config['bot']['token']
@@ -44,45 +48,62 @@ class Notifier
       password: config['database']['password'],
       dbname: config['database']['schema']
     )
-    @start = '
-    Hello, i\'ll notify you! Please, send /auth YOUR_TOKEN to authorize and /reset YOUR_TOKEN to set new.
-    '
   end
 
   def run
     Telegram::Bot::Client.run(@token) do |bot|
       @logger.info('Bot started!')
-      process = Thread.new { Client.new(bot).handle }
+      @process = Thread.new { Client.new(bot).handle }
       bot.listen do |message|
-        if message.text.include?('/start')
-          bot.api.send_message(
-            chat_id: message.chat.id,
-            text: @start
-          )
-        elsif message.text.include?('/auth')
-          txt = save_user(message)
-          bot.api.send_message(
-            chat_id: message.chat.id,
-            text: txt
-          )
-          process = reboot(process, bot) if txt.include?('success')
-        elsif message.text.include?('/reset')
-          txt = update_user_token(message)
-          bot.api.send_message(
-            chat_id: message.chat.id,
-            text: txt
-          )
-          process = reboot(process, bot) if txt.include?('success')
-        end
+        send_start_text(bot, message) if start?(message)
+        send_auth_message(bot, message) if auth?(message)
+        send_reset_message(bot, message) if reset?(message)
       end
     end
   end
 
   private
 
-  def reboot(thread, bot)
-    thread.kill
-    Thread.new { Client.new(bot).handle }
+  def send_start_text(bot, message)
+    bot.api.send_message(
+      chat_id: message.chat.id,
+      text: START
+    )
+  end
+
+  def start?(message)
+    message.text.include?('/start')
+  end
+
+  def send_auth_message(bot, message)
+    txt = save_user(message)
+    bot.api.send_message(
+      chat_id: message.chat.id,
+      text: txt
+    )
+    reboot_process(bot) if txt.include?('success')
+  end
+
+  def auth?(message)
+    message.text.include?('/auth')
+  end
+
+  def send_reset_message(bot, message)
+    txt = update_user_token(message)
+    bot.api.send_message(
+      chat_id: message.chat.id,
+      text: txt
+    )
+    reboot_process(bot) if txt.include?('success')
+  end
+
+  def reset?(message)
+    message.text.include?('/reset')
+  end
+
+  def reboot_process(bot)
+    @process.kill
+    @process = Thread.new { Client.new(bot).handle }
   end
 
   def save_user(message)

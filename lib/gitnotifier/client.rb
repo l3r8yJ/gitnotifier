@@ -32,10 +32,8 @@ class Client
   end
 
   def handle
-    Parallel.each(
-      Users.new.fetch,
-      in_threads: users.size
-    ) { |user| handle_single(user) }
+    users = Users.new.fetch
+    Parallel.each(users, in_threads: users.size) { |user| handle_single(user) }
   end
 
   private
