@@ -32,34 +32,40 @@ class Client
   end
 
   def handle
-    users = Users.new.fetch
-    @logger.info(users.map(&:id))
-    Parallel.each(users, in_threads: users.size) { |u| handle_single(u) }
+    Parallel.each(
+      Users.new.fetch,
+      in_threads: users.size
+    ) { |user| handle_single(user) }
   end
 
   def handle_single(user)
     client = Octokit::Client.new(access_token: user.token)
-    before = client.notifications({ all: false }).map { |n| n['id'] }
+    before = notifications(client)
     Kernel.loop do
-      current = client.notifications({ all: false }).map { |n| n['id'] }
+      current = notifications(client)
       diff = current - before
       unless diff.empty?
-        updates = client.notifications({ all: false }).map { |n| n if diff.include?(n['id']) }
-        txt = "[#{client.user.login}] new [notification](https://github.com/notifications):\n"
-        updates.each do |update|
-          txt.concat(
-            "New #{update.reason} in #{update.subject.type}.\n"
-          )
-        end
-        txt.concat('Take a look, please.')
-        @bot.api.send_message(
-          chat_id: user.id,
-          text: txt,
-          parse_mode: 'Markdown'
-        )
+        txt = notification_text(new_notifications(client, diff))
+        @bot.api.send_message(chat_id: user.id, text: txt, parse_mode: 'Markdown')
         before = current
       end
       sleep(2)
     end
+  end
+
+  def notifications(client)
+    client.notifications({ all: false }).map { |n| n['id'] }
+  end
+
+  def notification_text(updates)
+    txt = "[#{client.user.login}] new [notification](https://github.com/notifications):\n"
+    updates.each do |update|
+      txt.concat("New #{update.reason} in #{update.subject.type}.\n")
+    end
+    txt.concat('Take a look, please.')
+  end
+
+  def new_notifications(client, diff)
+    client.notifications({ all: false }).map { |n| n if diff.include?(n['id']) }
   end
 end
