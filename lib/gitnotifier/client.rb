@@ -43,9 +43,10 @@ class Client
     before = notifications(client)
     Kernel.loop do
       current = notifications(client)
+      @logger.info("before: #{before}, current: #{current}")
       diff = current - before
       unless diff.empty?
-        txt = notification_text(new_notifications(client, diff))
+        txt = notification_text(new_notifications(client, diff), client)
         @bot.api.send_message(chat_id: user.id, text: txt, parse_mode: 'Markdown')
         before = current
       end
@@ -57,7 +58,7 @@ class Client
     client.notifications({ all: false }).map { |n| n['id'] }
   end
 
-  def notification_text(updates)
+  def notification_text(updates, client)
     txt = "[#{client.user.login}] new [notification](https://github.com/notifications):\n"
     updates.each do |update|
       txt.concat("New #{update.reason} in #{update.subject.type}.\n")
