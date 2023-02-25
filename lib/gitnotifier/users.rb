@@ -22,7 +22,7 @@ require_relative 'user'
 require_relative 'security/decrypted_token'
 require 'pg'
 require 'yaml'
-# @todo #1 Redesign user and users class.
+# @todo #38 Redesign user and users class.
 # It should be more think about perfomance.
 
 # The users class.
