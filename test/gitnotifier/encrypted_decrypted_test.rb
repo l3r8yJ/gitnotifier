@@ -18,8 +18,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-require_relative '../../lib/gitnotifier/encrypted_token'
-require_relative '../../lib/gitnotifier/decrypted_token'
+require_relative '../../lib/gitnotifier/security/encrypted_token'
+require_relative '../../lib/gitnotifier/security/decrypted_token'
 require 'test_helper'
 require 'tmpdir'
 require 'tempfile'

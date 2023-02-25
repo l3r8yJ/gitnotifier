@@ -99,11 +99,6 @@ class Notifier
     message.text.include?('/reset')
   end
 
-  def reboot_process(bot)
-    @process.kill
-    @process = Thread.new { Client.new(bot).handle }
-  end
-
   def save_user(message)
     token = token('/auth', message)
     txt = 'Your token successfully registred!'
@@ -136,6 +131,11 @@ class Notifier
       @logger.error(e.to_s)
     end
     txt
+  end
+
+  def reboot_process(bot)
+    @process.kill
+    @process = Thread.new { Client.new(bot).handle }
   end
 
   def incorrect_token_txt(txt, token)

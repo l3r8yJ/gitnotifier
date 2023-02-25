@@ -19,9 +19,11 @@
 # SOFTWARE.
 
 require_relative 'user'
-require_relative 'decrypted_token'
+require_relative 'security/decrypted_token'
 require 'pg'
 require 'yaml'
+# @todo #1 Redesign user and users class.
+# It should be more think about perfomance.
 
 # The users class.
 # Author:: Ivanchuk Ivan (clicker.heroes.acg@gmail.com)
@@ -39,9 +41,9 @@ class Users
   end
 
   def fetch
-    @pgsql.exec('SELECT * FROM bot_user').map do |u|
+    @pgsql.exec('SELECT * FROM bot_user').map do |record|
       User.new(
-        u['id'].to_i,
+        record['id'].to_i,
         DecryptedToken.new(u['token']).to_s,
         @pgsql
       )

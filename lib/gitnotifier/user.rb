@@ -18,8 +18,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-require_relative 'encrypted_token'
-require_relative 'decrypted_token'
+require_relative 'security/encrypted_token'
+require_relative 'security/decrypted_token'
 require 'pg'
 require 'yaml'
 
@@ -33,7 +33,7 @@ class User
   # We have to write integration and unit tests for User class.
   # @todo #13 Design/ The user class must be separated.
   # It is necessary to decompose into several other classes.
-  attr_reader :id, :token
+  attr_reader :id
 
   def initialize(id, token = nil, pgsql = nil)
     @id = id
@@ -67,15 +67,19 @@ class User
     )
   end
 
+  def token
+    @token || DecryptedToken.new(
+      @pgsql.exec('SELECT * FROM bot_user WHERE id=$1 LIMIT 1', [@id])[0]['token']
+    ).to_s
+  end
+
   def update_token(token)
     check_pgsql
     @pgsql.exec(
       'UPDATE bot_user SET token=$1 WHERE id=$2',
-      [
-        EncryptedToken.new(token).to_s,
-        @id
-      ]
+      [EncryptedToken.new(token).to_s, @id]
     )
+    @token = nil
   end
 
   private

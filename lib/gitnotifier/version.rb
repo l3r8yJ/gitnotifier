@@ -23,5 +23,5 @@
 # Copyright:: Copyright (c) 2022 Ivanchuck Ivan
 # License:: MIT
 module GitNotifier
-    VERSION = '0.1.0'.freeze
+    VERSION = '0.0.0'.freeze
 end
